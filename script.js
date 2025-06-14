@@ -2,11 +2,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const addButton = document.getElementById('add-task-btn');
     const taskInput = document.getElementById('task-input');
     const taskList = document.getElementById('task-list');
-    
-    // Initialize 
     let tasks = [];
 
-    // Load tasks from Local Storage when page loads
+    // Load tasks from Local Storage
     function loadTasks() {
         const storedTasks = localStorage.getItem('tasks');
         if (storedTasks) {
@@ -17,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Create task element (separated from addTask for reuse)
+    // Create task element with visual feedback
     function createTaskElement(taskText, saveToStorage = true) {
         const listItem = document.createElement('li');
         listItem.textContent = taskText;
@@ -27,33 +25,38 @@ document.addEventListener('DOMContentLoaded', function() {
         removeButton.className = "remove-btn";
         
         removeButton.addEventListener('click', function() {
-            // Remove from DOM
-            taskList.removeChild(listItem);
+            // Add visual feedback before removal
+            listItem.classList.add('removing');
             
-            // Remove from tasks array
-            const taskIndex = tasks.indexOf(taskText);
-            if (taskIndex > -1) {
-                tasks.splice(taskIndex, 1);
-                updateLocalStorage();
-            }
+            setTimeout(() => {
+                taskList.removeChild(listItem);
+                const taskIndex = tasks.indexOf(taskText);
+                if (taskIndex > -1) {
+                    tasks.splice(taskIndex, 1);
+                    updateLocalStorage();
+                }
+            }, 300); // Match with CSS transition duration
         });
         
         listItem.appendChild(removeButton);
         taskList.appendChild(listItem);
         
-        // Add to tasks array and update storage if needed
+        // Add visual feedback for new task
+        listItem.classList.add('adding');
+        setTimeout(() => {
+            listItem.classList.remove('adding');
+        }, 300);
+        
         if (saveToStorage) {
             tasks.push(taskText);
             updateLocalStorage();
         }
     }
 
-    // Update Local Storage with current tasks
     function updateLocalStorage() {
         localStorage.setItem('tasks', JSON.stringify(tasks));
     }
 
-    // Main add task function
     function addTask() {
         const taskText = taskInput.value.trim();
         
@@ -75,6 +78,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Load tasks when page loads
+    // Initialize
     loadTasks();
 });
